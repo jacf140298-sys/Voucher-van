@@ -17,7 +17,7 @@ st.info(f"💡 Cotización base de hoy lunes: **${cotilunes}**")
 
 # Formulario para ingresar datos de forma ordenada
 with st.form("formulario_voucher", clear_on_submit=True):
-    nuevo_monto = st.number_input("Monto del Voucher ($):", min_value=0, step=1, value=0)
+    nuevo_monto = st.number_input("Monto del Voucher (S/):", min_value=0.0, step=0.50, value=0.0, format="%0.2f")
     boton_agregar = st.form_submit_button("Agregar Voucher")
     
     if boton_agregar:
