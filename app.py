@@ -1,55 +1,41 @@
-import streamlit as st
+# Algoritmo CuentaCar - Versión Optimizada y Segura
 
-# Configuración de la página del celular
-st.set_page_config(page_title="Mi Control de Vouchers", page_icon="📊", layout="centered")
+# 1. Definimos las variables constantes y la lista de días
+cotizacion_diaria = 10
+deuda_fise = 645
+dias_semana = ["lunes", "martes", "miércoles", "jueves", "viernes", "sábado"]
 
-st.title("📊 Mi Espacio de Control")
-st.subheader("Registro de Vouchers - Lunes")
-
-cotilunes = 10
-
-# Estructura lógica del estado de la app (para que no pierda los datos al hacer clic)
-if 'lista_vouchers' not in st.session_state:
-    st.session_state.lista_vouchers = []
-
-# --- INTERFAZ VISUAL ---
-st.info(f"💡 Cotización base de hoy lunes: **${cotilunes}**")
-
-# Formulario para ingresar datos de forma ordenada
-with st.form("formulario_voucher", clear_on_submit=True):
-    nuevo_monto = st.number_input("Monto del Voucher (S/):", min_value=0.0, step=0.50, value=0.0, format="%0.2f")
-    boton_agregar = st.form_submit_button("Agregar Voucher")
+# 2. Bucle principal: Recorre cada día de la semana
+for dia in dias_semana:
+    print(f"\n--- Registro del {dia.capitalize()} ---")
+    fise_dia = 0 # Inicializamos el acumulador diario en cero
     
-    if boton_agregar:
-        if nuevo_monto > 0:
-            st.session_state.lista_vouchers.append(nuevo_monto)
-            st.success(f"✅ Voucher de ${nuevo_monto} registrado.")
+    # 3. Bucle interno: Pide hasta 3 vouchers diarios
+    for i in range(1, 4):
+        
+        # Filtro de seguridad (1% margen de error): Evita que el programa colapse si no ingresan un número
+        while True:
+            try:
+                entrada = input(f"¿Cuánto es el voucher {i} del {dia}? (Ingresa 0 si no hay más): ")
+                voucher = int(entrada)
+                break # Si es un número válido, rompemos el bucle de validación
+            except ValueError:
+                print("¡Ups! Por favor, ingresa un número entero válido (ej. 10, 15, 0).")
+        
+        # Lógica de acumulación
+        if voucher > 0:
+            fise_dia += voucher
         else:
-            st.warning("El monto debe ser mayor a 0.")
+            break # Si ingresa 0, cerramos el registro de vouchers para ese día
+            
+    # 4. Cálculos y reportes finales del día
+    if fise_dia > 0:
+        print(f"Cotización de {dia} es: {cotizacion_diaria}")
+        print(f"Total fise {dia} es: {fise_dia}")
+        print(f"Total costo {dia}: {cotizacion_diaria + fise_dia}")
+        
+        # Actualizamos la deuda restando lo acumulado en el día
+        deuda_fise -= fise_dia
+        print(f"Deuda fise restante: {deuda_fise}")
 
-# --- PROCESAMIENTO Y REPORTE ---
-if st.session_state.lista_vouchers:
-    st.write("### 📝 Vouchers acumulados:")
-    
-    # Mostramos los elementos en una lista limpia
-    for idx, v in enumerate(st.session_state.lista_vouchers, 1):
-        st.text(f"• Voucher {idx}: ${v}")
-    
-    # Cálculos matemáticos exactos
-    total_fise_lunes = sum(st.session_state.lista_vouchers)
-    total_costo_lunes = cotilunes + total_fise_lunes
-    
-    st.markdown("---")
-    st.write("### 📈 Reporte de Resultados")
-    
-    # Mostramos los resultados en tarjetas visuales elegantes
-    col1, col2 = st.columns(2)
-    col1.metric(label="Total FISE Lunes", value=f"${total_fise_lunes}")
-    col2.metric(label="Total Costo Lunes", value=f"${total_costo_lunes}")
-    
-    # Botón para resetear el día
-    if st.button("🗑️ Limpiar y empezar nuevo día"):
-        st.session_state.lista_vouchers = []
-        st.rerun()
-else:
-    st.write("Aún no hay vouchers registrados para generar el informe.")
+print("\n¡Registro semanal completado con éxito!")
